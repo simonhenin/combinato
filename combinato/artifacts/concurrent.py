@@ -96,6 +96,7 @@ def write_bincount(folder):
         fid = tables.open_file(files[0], 'r')
         ts_beg = fid.root.thr[0, 0]
         ts_end = fid.root.thr[-1, 1]
+        fid.close()
     else:
         ncsf = next(iter(ncsfiles.values()))[0]
         ncsfid = NcsFile(ncsf)
