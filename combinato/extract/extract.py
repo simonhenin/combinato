@@ -159,6 +159,9 @@ def main():
         starts = list(range(start, laststart, blocksize))
         stops = starts[1:] + [stop]
         name = os.path.splitext(os.path.basename(f))[0]
+        #remove . from filenames as this causes downstream issues with spikeinterface
+        name = name.replace('.','_')
+        
         if references is not None:
             reference = references[f]
             print('{} (re-referenced to {})'.format(f, reference))
