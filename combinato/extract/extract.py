@@ -8,6 +8,7 @@ from argparse import ArgumentParser, FileType
 import tables
 from .mp_extract import mp_extract
 from .. import NcsFile
+import numpy as np
 
 
 def get_nrecs(filename):
@@ -20,6 +21,18 @@ def get_h5size(filename):
     fid.close()
     return n
 
+def get_binsize(filename):
+    """get number of samples in a bin file"""
+    fid = open(filename, 'rb')
+    fid.seek(0)
+    fid.seek(0, 2)  # Seek to end
+    file_size = fid.tell()
+    data_size = file_size - 8
+    bytes_per_sample = np.dtype(np.int32).itemsize
+    n_samples = data_size // bytes_per_sample
+    fid.close()
+    return n_samples
+
 
 def main():
     """standard main function"""
@@ -31,7 +44,7 @@ def main():
                             description='spike extraction from .ncs files',
                             epilog='Johannes Niediek (jonied@posteo.de)')
     parser.add_argument('--files', nargs='+',
-                        help='.ncs files to be extracted')
+                        help='.ncs files to be extracted', default=['/Users/seh223/Data/Liulab/microwire/NY941/2024-Aug-16_144340.sdma/2024-Aug-16_144340.csc017.bin'])
     parser.add_argument('--start', type=int,
                         help='start index for extraction')
     parser.add_argument('--stop', type=int,
@@ -128,11 +141,15 @@ def main():
         else:
             start = 0
 
-        nrecs = get_nrecs(f)
-        if args.stop:
-            stop = min(args.stop, nrecs)
+        if f.endswith('.bin'):
+            blocksize = 100000
+            stop = get_binsize(f)
         else:
-            stop = nrecs
+            nrecs = get_nrecs(f)
+            if args.stop:
+                stop = min(args.stop, nrecs)
+            else:
+                stop = nrecs
 
         if stop % blocksize > blocksize/2:
             laststart = stop-blocksize

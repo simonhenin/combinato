@@ -9,7 +9,7 @@ np.seterr(all='raise')
 
 import tables
 from .. import DefaultFilter
-from .tools import ExtractNcsFile, OutFile, read_matfile
+from .tools import ExtractNcsFile, OutFile, read_matfile, ExtractBinFile
 from .extract_spikes import extract_spikes
 
 
@@ -138,7 +138,11 @@ def read(jobs, q):
 
         else:
             if jname not in openfiles:
-                openfiles[jname] = ExtractNcsFile(job['filename'], job['reference'])
+                # check file extension
+                if job['filename'].endswith('.bin'):
+                    openfiles[jname] = ExtractBinFile(job['filename'], job['reference'])
+                else:
+                    openfiles[jname] = ExtractNcsFile(job['filename'], job['reference'])
 
             print('Read {} {: 7d} {: 7d}'.format(jname, job['start'], job['stop']))
             data = openfiles[jname].read(job['start'], job['stop'])

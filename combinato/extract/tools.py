@@ -6,7 +6,8 @@ from __future__ import absolute_import, print_function, division
 import os
 import numpy as np
 import tables
-from .. import NcsFile, DefaultFilter
+from .. import NcsFile, DefaultFilter, BinFile
+
 
 from scipy.io import loadmat
 
@@ -84,6 +85,51 @@ class ExtractNcsFile(object):
         atimes = np.hstack([t + self.timerange for t in times])/1e3
         # MUST NOT USE dictionaries here, because they would persist in memory
         return (fdata, atimes, self.ncs_file.timestep)
+    
+class ExtractBinFile(object):
+    """
+    reads data from neuralynx bin file with start/stop sample range support
+    """
+
+    def __init__(self, fname, ref_fname=None):
+        self.fname = fname
+        self.ref_fname = ref_fname
+        self.bin_file = BinFile(fname)        
+
+        # Reference file support
+        self.ref_file = None
+        if ref_fname is not None:
+            self.ref_file = BinFile(ref_fname)
+        
+        # Time range setup
+        stepus = self.bin_file.timestep * 1e6
+        # self.timerange = np.arange(0, SAMPLES_PER_REC * stepus, stepus)
+        
+        self.filter = DefaultFilter(self.bin_file.timestep)
+        
+
+    def read(self, start, stop):
+        """
+        read data from bin file for specified sample range
+        
+        Args:
+            start: start sample index
+            stop: stop sample index (exclusive)
+            
+        Returns:
+            tuple: (data_array, times_array, timestep)
+        """
+        # TODO: some checks here
+
+        fdata, atimes = self.bin_file.read(start, stop)
+        if self.ref_file is not None:
+            print('Reading reference data from {}'.
+                format(self.ref_file.filename))
+            ref_data, _ = self.ref_file.read(start, stop)
+            assert len(ref_data) == len(fdata), "Reference data length mismatch"
+            fdata -= ref_data
+        
+        return (fdata, atimes, self.bin_file.timestep)
 
 
 class OutFile(object):

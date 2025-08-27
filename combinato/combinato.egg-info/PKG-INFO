@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: combinato
+Version: 2.0.0
+Summary: Combinato spike sorting package
+Author: Johannes Niediek
+Author-email: jonied@posteo.de
+Requires-Python: >=3.6
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: h5py
+Requires-Dist: matplotlib
+Requires-Dist: PyQt5
+Requires-Dist: joblib
+Requires-Dist: tables
+Dynamic: author
+Dynamic: author-email
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
