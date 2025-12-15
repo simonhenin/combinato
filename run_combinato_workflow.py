@@ -53,18 +53,17 @@ def main(job_file, out_folder):
 
         sign = 'neg'
         label_ = 'basic'
-
-        sessions = prepare_main([fname], sign, 'index', 0,
-                                    None, 20000, label_, False, False)
-        if (sessions) :
-
-            for name, sign, ses in sessions:
-                cluster_main(name, ses, sign)
-            label = 'sort_{}_{}'.format(sign, label_)
-            outfname = combine_main(fname,
-                                    [os.path.basename(ses[2]) for ses in sessions],
-                                    label)
-            groups_main(fname, outfname)
+        for sign_ in ('pos', 'neg'):
+            sessions = prepare_main([fname], sign_, 'index', 0,
+                                        None, 20000, label_, False, False)
+            if (sessions) :
+                for name, sign, ses in sessions:
+                    cluster_main(name, ses, sign)
+                label = 'sort_{}_{}'.format(sign, label_)
+                outfname = combine_main(fname,
+                                        [os.path.basename(ses[2]) for ses in sessions],
+                                        label)
+                groups_main(fname, outfname)
 
 
 if __name__ == "__main__":
