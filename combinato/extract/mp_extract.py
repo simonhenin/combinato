@@ -114,6 +114,7 @@ def read(jobs, q):
                 sr = openfiles[jname].root.sr[0]
             else:
                 sr = 32000.
+            print( 'sampling rate: {:5.2f}'.format(sr))
             ts = 1/sr
             # here we need to shift the data according to job['start']
             atimes = np.linspace(0, fdata.shape[0]/(sr/1000), fdata.shape[0])

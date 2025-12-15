@@ -187,6 +187,12 @@ class BinFile(object):
             'SamplingFrequency': self.sampling_rate,
             'AcqEntName': f'bin_channel_0'
         }
+        print(f"Opened BinFile: {self.filename}, "
+              f"Data Type: {self.numpy_dtype}, "
+              f"Channels: {self.n_channels}, "
+              f"Total Samples: {self.total_samples}, "
+              f"Sampling Rate: {self.sampling_rate} Hz, "
+              f"Scaling Factor: {scaling_factor}")
 
     def __del__(self):
         if self.file is not None:

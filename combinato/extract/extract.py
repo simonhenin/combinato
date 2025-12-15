@@ -142,7 +142,9 @@ def main():
             start = 0
 
         if f.endswith('.bin'):
-            blocksize = 100000
+            # blocksize = 100000
+            # blocksize = 471858880
+            blocksize = 32768*5*60  # 5 minutes of data at 32kHz TODO: make this adjustable
             stop = get_binsize(f)
         else:
             nrecs = get_nrecs(f)
@@ -158,6 +160,7 @@ def main():
 
         starts = list(range(start, laststart, blocksize))
         stops = starts[1:] + [stop]
+
         name = os.path.splitext(os.path.basename(f))[0]
         #remove . from filenames as this causes downstream issues with spikeinterface
         name = name.replace('.','_')

@@ -70,7 +70,7 @@ def cluster_features(features, folder, name, random_seed=None):
         fid.write('WriteLables|\n')
         fid.write('WriteCorFile~\n')
         #fid.write('ForceRandomSeed: %f\n' % np.random.random() * 2**32)
-        fid.write('ForceRandomSeed: %f\n' % random_seed)
+        fid.write('ForceRandomSeed: %f\n' % (random_seed if random_seed is not None else 0.0))
     fid.close()
 
     if options['ShowSPCOutput']:
