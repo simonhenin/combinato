@@ -9,7 +9,8 @@ import tables
 from .. import NcsFile, DefaultFilter, BinFile
 
 
-from scipy.io import loadmat
+# from scipy.io import loadmat
+from mat73 import loadmat
 
 SAMPLES_PER_REC = 512
 DEFAULT_MAT_SR = 24000

@@ -13,12 +13,24 @@ from combinato.cluster.cluster import main as cluster_main
 from combinato.cluster.concatenate import main as combine_main
 from combinato.cluster.create_groups import main as groups_main
 
-# job_file = '/Users/seh223/combinato_jobs.txt'
-# out_folder = '/Users/seh223/combinato_out/'
+# Usage:
+#   python run_combinato_workflow.py --jobs jobs.txt --destination /path/to/output/folder
+#
+# Multiple job files, same destination:
+#   python run_combinato_workflow.py --jobs job1.txt job2.txt job3.txt --destination /out
+#
+# Multiple job files, different destinations:
+#   python run_combinato_workflow.py --jobs job1.txt job2.txt job3.txt --destination /out1 /out2 /out3
+#
+# Process only one polarity (default: both pos and neg):
+#   python run_combinato_workflow.py --jobs jobs.txt --destination /out --sign neg
+#   python run_combinato_workflow.py --jobs jobs.txt --destination /out --sign pos
+#
+# example job1.txt:
+#   /path/to/electrode.bin
 
 
-
-def main(job_file, out_folder):
+def main(job_file, out_folder, signs=('pos', 'neg')):
     print('Using job file: {}'.format(job_file))
 
     if not os.path.exists(os.path.expanduser(out_folder)):
@@ -53,7 +65,7 @@ def main(job_file, out_folder):
 
         sign = 'neg'
         label_ = 'basic'
-        for sign_ in ('pos', 'neg'):
+        for sign_ in signs:
             sessions = prepare_main([fname], sign_, 'index', 0,
                                         None, 20000, label_, False, False)
             if (sessions) :
@@ -67,11 +79,12 @@ def main(job_file, out_folder):
 
 
 if __name__ == "__main__":
-     
+
     parser = ArgumentParser('run_combinato_workflow.py',
                             description='runs combinato workflow using jobs')
-    parser.add_argument('--jobs', type=FileType('r'))
-    parser.add_argument('--destination', nargs=1)
+    parser.add_argument('--jobs', type=FileType('r'), nargs='+')
+    parser.add_argument('--destination', nargs='+')
+    parser.add_argument('--sign', choices=['pos', 'neg'], nargs='+', default=['pos', 'neg'])
     args = parser.parse_args()
 
     if args.destination is None:
@@ -81,4 +94,14 @@ if __name__ == "__main__":
         print('Supply job file using --jobs')
         sys.exit(1)
 
-    main(args.jobs.name, args.destination[0])
+    job_files = [f.name for f in args.jobs]
+    destinations = args.destination
+
+    if len(destinations) == 1:
+        destinations = destinations * len(job_files)
+    elif len(destinations) != len(job_files):
+        print('Number of destinations must be 1 or match the number of job files')
+        sys.exit(1)
+
+    for job_file, dest in zip(job_files, destinations):
+        main(job_file, dest, args.sign)

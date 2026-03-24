@@ -180,8 +180,12 @@ class BinFile(object):
                 self.total_samples = total_values
         
         # Set up header info compatible with NcsFile format
-        scaling_factor = self.metadata.get('ADBitVolts', 
-                                         self.metadata.get('scale', 1.0))
+        scaling_factor = self.metadata.get('ADBitVolts',
+                                         self.metadata.get('scale', None))
+        if scaling_factor is None:
+            print(f"WARNING: ADBitVolts not found in metadata for {self.filename}. "
+                  f"Data will NOT be correctly scaled to microvolts.")
+            scaling_factor = 1.0
         self.header = {
             'ADBitVolts': scaling_factor,  # Convert to ADBitVolts format
             'SamplingFrequency': self.sampling_rate,
@@ -195,8 +199,8 @@ class BinFile(object):
               f"Scaling Factor: {scaling_factor}")
 
     def __del__(self):
-        if self.file is not None:
-            self.file.close()
+        if self.bin_file is not None:
+            self.bin_file.close()
 
     def read(self, start=0, stop=None):
         """
